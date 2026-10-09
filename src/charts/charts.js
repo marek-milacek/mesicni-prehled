@@ -49,11 +49,11 @@ export const CATEGORY_COLORS = {
 
 /** České názvy kategorií */
 export const CATEGORY_LABELS = {
-  navyk: 'Návyky',
-  ukol: 'Úkoly',
-  studium: 'Studium',
-  vydaj: 'Výdaje',
-  nalada: 'Nálada',
+  navyk: '🎯 Návyky & Rituály',
+  ukol: '✅ Úkoly & Projekty',
+  studium: '📚 Studium & Skill',
+  vydaj: '💰 Výdaje & Rozpočet',
+  nalada: '⚡ Energie & Nálada',
 };
 
 function destroyChart(canvasId) {

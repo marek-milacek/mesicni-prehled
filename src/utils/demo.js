@@ -7,24 +7,60 @@ import { getCurrentMonth, shiftMonth, getDaysInMonth } from './date.js';
 
 const CATEGORY_CONFIG = {
   navyk: {
-    values: [1], // splněno/nesplněno
-    notes: ['Ranní cvičení', 'Čtení 30 min', 'Meditace', 'Pití vody 2l', 'Žádný telefon před spaním', 'Procházka'],
+    values: [1], // splněno
+    notes: [
+      '💧 Vypito 2,5 l čisté vody',
+      '🏃 Ranní workout & protažení',
+      '📖 30 minut četby odborné knihy',
+      '📵 Žádný telefon 1 h před spaním',
+      '🧘 Ranní plánování & soustředění',
+      '🥗 Výživný oběd a vitamíny',
+      '🚶‍♂️ 10 000 kroků na čerstvém vzduchu',
+    ],
   },
   ukol: {
     values: [1],
-    notes: ['Úklid pokoje', 'Nákup', 'Opravit kolo', 'Zavolat babičce', 'Vyřídit reklamaci', 'Zalít květiny'],
+    notes: [
+      '🚀 Dokončit praktický projekt SPŠD',
+      '📑 Odevzdat laboratorní protokol',
+      '🎫 Koupit studentskou Lítačku MHD',
+      '📦 Připravit podklady na maturitní téma',
+      '🧹 Efektivní organizace pracovního stolu',
+      '✉️ Vyřídit důležité studijní e-maily',
+    ],
   },
   studium: {
-    values: [30, 45, 60, 90, 120, 15, 20],
-    notes: ['Matematika', 'Fyzika', 'Programování', 'Angličtina', 'Čeština', 'Dějepis', 'Příprava na test'],
+    values: [30, 45, 60, 90, 120, 150],
+    notes: [
+      '💻 Frontend vývoj & JavaScript ES moduly',
+      '📐 Aplikovaná matematika & diferenciály',
+      '⚡ Dopravní systémy & telematika SPŠD',
+      '🇬🇧 Odborná angličtina (B2 level)',
+      '🌐 Vývoj webových aplikací ve Vite',
+      '📊 Databáze a REST API architektura',
+    ],
   },
   vydaj: {
-    values: [50, 89, 120, 35, 250, 45, 199, 65, 490, 150],
-    notes: ['Oběd', 'Svačina', 'Jízdenka MHD', 'Káva', 'Kniha', 'Kino', 'Oblečení', 'Dárek', 'Sport', 'Předplatné'],
+    values: [65, 89, 120, 45, 220, 190, 399, 150, 450],
+    notes: [
+      '🍜 Studentský oběd v menze',
+      '☕ Prémiová káva při studiu',
+      '🚇 Studentský kupón MHD Praha',
+      '📚 Kniha o moderním JavaScriptu',
+      '🎬 Vstupenka do kina IMAX s partou',
+      '🏋️‍♂️ Vstupné do posilovny & fitness',
+      '🎧 Předplatné Spotify na poslech při kódování',
+    ],
   },
   nalada: {
-    values: [1, 2, 3, 4, 5, 3, 4, 4, 5, 3, 2, 4],
-    notes: ['Skvělý den', 'Průměrný den', 'Unavený', 'Super nálada', 'Stresový den', 'Pohoda', 'Produktivní', 'Líný den'],
+    values: [4, 5, 4, 3, 5, 4, 5, 4, 3, 5],
+    notes: [
+      '🔥 Maximální flow a super produktivita',
+      '💪 Skvělý pocit ze zvládnutých úkolů',
+      '⚡ Vysoká energie po sportu a cvičení',
+      '☕ Klidný, soustředěný a pohodový den',
+      '🚀 Motivovaný posouvat svůj projekt dál',
+    ],
   },
 };
 

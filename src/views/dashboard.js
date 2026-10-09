@@ -1,6 +1,7 @@
 /**
  * View: Dashboard (hlavní stránka po přihlášení).
- * Zobrazuje shrnutí aktuálního měsíce, rychlý formulář a navigaci.
+ * Obsahuje uvítací hero banner, 1-click sledovač návyků, statistické karty,
+ * rychlý vstupní formulář a výpis posledních aktivit.
  */
 
 import * as api from '../api/client.js';
@@ -8,7 +9,7 @@ import { getState } from '../state/store.js';
 import { navigate } from '../router.js';
 import { showToast } from '../utils/toast.js';
 import { createElement, clearElement, showSkeleton, showError, showEmpty } from '../utils/dom.js';
-import { getMonthName, formatNumber, formatCurrency } from '../utils/date.js';
+import { getMonthName, formatNumber, formatCurrency, getToday, getDaysInMonth } from '../utils/date.js';
 import { CATEGORY_LABELS } from '../charts/charts.js';
 
 export async function renderDashboard(container) {
@@ -16,38 +17,43 @@ export async function renderDashboard(container) {
 
   const page = createElement('div', { className: 'dashboard' });
 
-  // Hlavička
-  const header = createElement('header', { className: 'dashboard__header' },
-    createElement('h2', { className: 'page-title' },
-      `Přehled – ${getMonthName(getState().currentMonth)}`
-    ),
-  );
-  page.appendChild(header);
+  // 1. Uvítací Hero Banner
+  const hero = createHeroBanner();
+  page.appendChild(hero);
 
-  // Statistiky – karty
+  // 2. Statistiky – karty
   const statsGrid = createElement('div', { className: 'stats-grid', id: 'dashboard-stats' });
   page.appendChild(statsGrid);
 
-  // Rychlý vstup
+  // 3. Rychlé zaznamenání návyků (1-click habit logger)
+  const quickHabits = createQuickHabitsSection();
+  page.appendChild(quickHabits);
+
+  // 4. Rychlý vstupní formulář
   const quickSection = createElement('section', { className: 'quick-entry' },
-    createElement('h3', { className: 'section-title' }, 'Rychlý záznam'),
+    createElement('div', { className: 'section-header' },
+      createElement('h3', { className: 'section-title' }, '➕ Nový detailní záznam'),
+      createElement('p', { className: 'section-subtitle' }, 'Zapište úkol, čas studia, výdaj nebo svou náladu'),
+    ),
   );
   const quickForm = createQuickForm();
   quickSection.appendChild(quickForm);
   page.appendChild(quickSection);
 
-  // Poslední záznamy
+  // 5. Poslední záznamy
   const recentSection = createElement('section', { className: 'recent-entries' },
-    createElement('h3', { className: 'section-title' }, 'Poslední záznamy'),
+    createElement('div', { className: 'section-header' },
+      createElement('h3', { className: 'section-title' }, '🕒 Poslední zaznamenané aktivity'),
+    ),
   );
   const recentList = createElement('div', { id: 'recent-list', className: 'entries-list' });
   recentSection.appendChild(recentList);
 
   const viewAllBtn = createElement('button', {
-    className: 'btn btn--ghost btn--full',
+    className: 'btn btn--secondary btn--full',
     type: 'button',
     onClick: () => navigate('entries'),
-  }, 'Zobrazit všechny záznamy →');
+  }, 'Zobrazit všechny záznamy a filtry →');
   recentSection.appendChild(viewAllBtn);
 
   page.appendChild(recentSection);
@@ -56,6 +62,106 @@ export async function renderDashboard(container) {
 
   // Načti data
   await loadDashboardData(statsGrid, recentList);
+}
+
+function createHeroBanner() {
+  const user = getState().user;
+  const currentMonth = getState().currentMonth;
+  const today = getToday();
+  const dayOfMonth = parseInt(today.split('-')[2], 10);
+  const totalDays = getDaysInMonth(currentMonth);
+  const percentDone = Math.min(100, Math.round((dayOfMonth / totalDays) * 100));
+
+  const banner = createElement('div', { className: 'hero-banner' });
+
+  const left = createElement('div', { className: 'hero-banner__left' },
+    createElement('div', { className: 'hero-badge' }, '⚡ Přehled měsíce'),
+    createElement('h2', { className: 'hero-title' },
+      `Ahoj, ${user ? user.username : 'studente'}! 👋`
+    ),
+    createElement('p', { className: 'hero-subtitle' },
+      `Měsíc ${getMonthName(currentMonth)} • Dnes je ${dayOfMonth}. den. Každý splněný návyk tě posouvá blíž k cíli!`
+    ),
+  );
+
+  const right = createElement('div', { className: 'hero-banner__right' },
+    createElement('div', { className: 'month-progress' },
+      createElement('div', { className: 'month-progress__labels' },
+        createElement('span', { className: 'text-muted' }, `Průběh měsíce (${dayOfMonth} / ${totalDays} dní)`),
+        createElement('strong', { className: 'text-primary' }, `${percentDone} %`),
+      ),
+      createElement('div', { className: 'month-progress__track' },
+        createElement('div', {
+          className: 'month-progress__bar',
+          style: `width: ${percentDone}%;`,
+        }),
+      ),
+    ),
+  );
+
+  banner.appendChild(left);
+  banner.appendChild(right);
+  return banner;
+}
+
+function createQuickHabitsSection() {
+  const section = createElement('section', { className: 'quick-habits' });
+
+  const header = createElement('div', { className: 'section-header' },
+    createElement('h3', { className: 'section-title' }, '⚡ Rychlé návyky dne (1 kliknutí)'),
+    createElement('p', { className: 'section-subtitle' }, 'Klikni na návyk a okamžitě ho zaznamenej pro dnešek bez vyplňování formuláře:'),
+  );
+  section.appendChild(header);
+
+  const habits = [
+    { label: '💧 2,5 l vody', category: 'navyk', value: 1, note: '💧 Vypito 2,5 l čisté vody', tags: ['zdraví', 'voda'] },
+    { label: '🏃 Ranní workout', category: 'navyk', value: 1, note: '🏃 Ranní workout & protažení', tags: ['sport', 'energie'] },
+    { label: '💻 60 m kódování', category: 'studium', value: 60, note: '💻 Programování & praktický projekt SPŠD', tags: ['škola', 'it'] },
+    { label: '📖 30 m četba', category: 'navyk', value: 1, note: '📖 30 minut četby odborné knihy', tags: ['mysl'] },
+    { label: '📵 Digitální detox', category: 'navyk', value: 1, note: '📵 Žádný telefon 1 h před spaním', tags: ['spánek'] },
+    { label: '🔥 Skvělá nálada (5/5)', category: 'nalada', value: 5, note: '🔥 Maximální flow a super produktivita', tags: ['nálada'] },
+  ];
+
+  const grid = createElement('div', { className: 'quick-habits-grid' });
+
+  for (const h of habits) {
+    const btn = createElement('button', {
+      className: 'quick-habit-pill',
+      type: 'button',
+      onClick: async () => {
+        btn.disabled = true;
+        try {
+          await api.createEntry({
+            date: getToday(),
+            category: h.category,
+            value: h.value,
+            note: h.note,
+            tags: h.tags,
+          });
+          btn.classList.add('quick-habit-pill--done');
+          showToast(`Skvělé! "${h.label}" zaznamenáno pro dnešek 🎉`, 'success');
+
+          // Obnovit statistiky a seznam
+          const statsGrid = document.getElementById('dashboard-stats');
+          const recentList = document.getElementById('recent-list');
+          if (statsGrid && recentList) {
+            await loadDashboardData(statsGrid, recentList);
+          }
+        } catch (err) {
+          showToast(err.message || 'Chyba při uložení návyku.', 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      },
+    },
+      createElement('span', { className: 'quick-habit-pill__text' }, h.label),
+      createElement('span', { className: 'quick-habit-pill__check' }, '+'),
+    );
+    grid.appendChild(btn);
+  }
+
+  section.appendChild(grid);
+  return section;
 }
 
 async function loadDashboardData(statsGrid, recentList) {
@@ -81,44 +187,50 @@ function renderStatsCards(container, stats) {
 
   const cards = [
     {
-      label: 'Celkem záznamů',
+      label: 'Celkem aktivit',
       value: formatNumber(stats.totalEntries),
-      icon: '📝',
-      color: 'var(--color-primary)',
+      icon: '📊',
+      badge: 'záznamů',
+      color: 'var(--primary)',
     },
     {
-      label: 'Nejdelší série',
+      label: 'Série dnů v řadě',
       value: `${stats.longestStreak} dní`,
       icon: '🔥',
-      color: 'var(--color-warning)',
+      badge: 'streak',
+      color: 'var(--warning)',
     },
     {
-      label: 'Průměr/den',
+      label: 'Denní průměr',
       value: formatNumber(stats.averagePerDay),
-      icon: '📊',
-      color: 'var(--color-success)',
+      icon: '⚡',
+      badge: 'aktivity/den',
+      color: 'var(--success)',
     },
     {
       label: 'vs. minulý měsíc',
       value: stats.comparison
         ? `${stats.comparison.diff >= 0 ? '+' : ''}${stats.comparison.diff}`
-        : '—',
+        : '0',
       icon: stats.comparison && stats.comparison.diff >= 0 ? '📈' : '📉',
+      badge: stats.comparison && stats.comparison.diff >= 0 ? 'nárůst' : 'pokles',
       color: stats.comparison && stats.comparison.diff >= 0
-        ? 'var(--color-success)'
-        : 'var(--color-danger)',
+        ? 'var(--success)'
+        : 'var(--error)',
     },
   ];
 
   for (const card of cards) {
     const el = createElement('div', { className: 'stat-card' },
-      createElement('span', { className: 'stat-card__icon', 'aria-hidden': 'true' }, card.icon),
+      createElement('div', { className: 'stat-card__icon', 'aria-hidden': 'true' }, card.icon),
       createElement('div', { className: 'stat-card__content' },
-        createElement('span', { className: 'stat-card__value' }, card.value),
+        createElement('div', { className: 'stat-card__top' },
+          createElement('span', { className: 'stat-card__value' }, card.value),
+          createElement('span', { className: 'stat-card__badge' }, card.badge),
+        ),
         createElement('span', { className: 'stat-card__label' }, card.label),
       ),
     );
-    el.style.setProperty('--card-accent', card.color);
     container.appendChild(el);
   }
 }
@@ -126,76 +238,112 @@ function renderStatsCards(container, stats) {
 function renderRecentEntries(container, entries) {
   clearElement(container);
 
-  if (entries.length === 0) {
-    showEmpty(container, 'Zatím žádné záznamy. Přidejte první!', '✨');
+  if (!entries || entries.length === 0) {
+    showEmpty(container, 'Zatím žádné záznamy pro tento měsíc. Přidejte svůj první návyk nebo úkol výše!');
     return;
   }
 
   for (const entry of entries) {
-    const el = createElement('div', { className: 'entry-item', dataset: { id: entry.id } },
-      createElement('div', {
-        className: `entry-item__category entry-item__category--${entry.category}`,
-        'aria-hidden': 'true',
-      }, getCategoryIcon(entry.category)),
-      createElement('div', { className: 'entry-item__content' },
-        createElement('span', { className: 'entry-item__note' },
-          entry.note || CATEGORY_LABELS[entry.category] || entry.category,
+    const item = createElement('div', { className: 'entry-card' },
+      createElement('div', { className: 'entry-card__main' },
+        createElement('span', {
+          className: `entry-card__icon tag--${entry.category}`,
+          'aria-hidden': 'true',
+        }, getCategoryIcon(entry.category)),
+        createElement('div', { className: 'entry-card__details' },
+          createElement('strong', { className: 'entry-card__title' },
+            entry.note || CATEGORY_LABELS[entry.category] || entry.category,
+          ),
+          createElement('div', { className: 'entry-card__meta' },
+            createElement('span', {}, entry.date),
+            createElement('span', { className: `tag tag--${entry.category}` },
+              CATEGORY_LABELS[entry.category] || entry.category,
+            ),
+          ),
         ),
-        createElement('span', { className: 'entry-item__meta' },
-          `${entry.date} · ${formatEntryValue(entry)}`,
+      ),
+      createElement('div', { className: 'entry-card__right' },
+        createElement('span', { className: 'entry-card__value' },
+          formatEntryValue(entry),
         ),
       ),
     );
-    container.appendChild(el);
+    container.appendChild(item);
   }
 }
 
 function createQuickForm() {
-  const form = createElement('form', { className: 'quick-form', id: 'quick-entry-form' });
+  const form = createElement('form', { className: 'quick-entry-form', id: 'quick-entry-form' });
 
+  // Datum (výchozí dnešek)
   const dateInput = createElement('input', {
     type: 'date',
+    className: 'form-input',
     id: 'quick-date',
-    className: 'form-input',
+    value: getToday(),
     required: '',
   });
-  // Nastaví dnešní datum
-  const today = new Date();
-  dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+  // Kategorie
   const categorySelect = createElement('select', {
+    className: 'form-select',
     id: 'quick-category',
-    className: 'form-input',
     required: '',
   });
-  categorySelect.appendChild(createElement('option', { value: '' }, 'Kategorie…'));
+  categorySelect.appendChild(createElement('option', { value: '' }, 'Vyberte kategorii…'));
   for (const [key, label] of Object.entries(CATEGORY_LABELS)) {
     categorySelect.appendChild(createElement('option', { value: key }, label));
   }
 
+  // Hodnota
   const valueInput = createElement('input', {
     type: 'number',
-    id: 'quick-value',
     className: 'form-input',
-    placeholder: 'Hodnota',
+    id: 'quick-value',
+    placeholder: 'Hodnota (např. 1, 60, 150)',
+    step: 'any',
     min: '0',
-    step: '1',
     required: '',
   });
 
+  // Dynamický placeholder
+  categorySelect.addEventListener('change', () => {
+    switch (categorySelect.value) {
+      case 'navyk':
+      case 'ukol':
+        valueInput.value = '1';
+        valueInput.placeholder = '1 (splněno)';
+        break;
+      case 'studium':
+        valueInput.placeholder = 'Minuty (např. 45)';
+        break;
+      case 'vydaj':
+        valueInput.placeholder = 'Částka v Kč (např. 120)';
+        break;
+      case 'nalada':
+        valueInput.placeholder = 'Nálada (1–5)';
+        valueInput.max = '5';
+        break;
+      default:
+        valueInput.placeholder = 'Hodnota';
+    }
+  });
+
+  // Poznámka
   const noteInput = createElement('input', {
     type: 'text',
-    id: 'quick-note',
     className: 'form-input',
-    placeholder: 'Poznámka (volitelné)',
+    id: 'quick-note',
+    placeholder: 'Poznámka (např. Ranní workout, Kódování projektu, Oběd...)',
     maxlength: '500',
   });
 
+  // Submit
   const submitBtn = createElement('button', {
     type: 'submit',
     className: 'btn btn--primary',
     id: 'quick-submit',
-  }, 'Přidat');
+  }, '🚀 Uložit záznam');
 
   form.appendChild(dateInput);
   form.appendChild(categorySelect);
@@ -215,14 +363,14 @@ function createQuickForm() {
     };
 
     if (!data.date || !data.category || isNaN(data.value)) {
-      showToast('Vyplňte datum, kategorii a hodnotu.', 'warning');
+      showToast('Vyplňte prosím datum, kategorii a hodnotu.', 'warning');
       return;
     }
 
     submitBtn.disabled = true;
     try {
       await api.createEntry(data);
-      showToast('Záznam přidán!', 'success');
+      showToast('Záznam byl úspěšně přidán! ✨', 'success');
       valueInput.value = '';
       noteInput.value = '';
 
@@ -243,7 +391,7 @@ function createQuickForm() {
 }
 
 function getCategoryIcon(category) {
-  const icons = { navyk: '🎯', ukol: '✅', studium: '📚', vydaj: '💰', nalada: '😊' };
+  const icons = { navyk: '🎯', ukol: '✅', studium: '📚', vydaj: '💰', nalada: '⚡' };
   return icons[category] || '📌';
 }
 
@@ -254,7 +402,10 @@ function formatEntryValue(entry) {
     case 'vydaj':
       return formatCurrency(entry.value);
     case 'nalada':
-      return `${entry.value}/5`;
+      return `${entry.value}/5 ⭐`;
+    case 'navyk':
+    case 'ukol':
+      return 'Splněno ✓';
     default:
       return String(entry.value);
   }
