@@ -1,4 +1,24 @@
 // Setup file pro Vitest prostředí
+import { webcrypto } from 'node:crypto';
+
+// Zajištění crypto a crypto.subtle v jsdom prostředí
+if (typeof window !== 'undefined') {
+  if (!window.crypto || !window.crypto.subtle) {
+    Object.defineProperty(window, 'crypto', {
+      value: webcrypto,
+      configurable: true,
+      writable: true,
+    });
+  }
+}
+
+if (!globalThis.crypto || !globalThis.crypto.subtle) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true,
+    writable: true,
+  });
+}
 
 class MemoryStorage {
   constructor() {
