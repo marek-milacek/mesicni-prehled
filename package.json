@@ -23,6 +23,8 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
-    "chart.js": "^4.4.0"
+    "@tailwindcss/vite": "^4.3.3",
+    "chart.js": "^4.4.0",
+    "tailwindcss": "^4.3.3"
   }
 }
