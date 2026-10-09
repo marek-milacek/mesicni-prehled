@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Měsíční přehled | SPŠD Motol – Marek Miláček</title>
+    <meta
+      name="description"
+      content="Měsíční přehled (Month in Review) – webová aplikace pro sledování návyků, úkolů, studia, výdajů a nálady. Praktický školní projekt studenta SPŠD Motol, Marek Miláček, 3.A."
+    />
+    <meta name="author" content="Marek Miláček, SPŠD Motol" />
+    <meta name="theme-color" content="#1e1e2e" />
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>"
+    />
+  </head>
+  <body>
+    <div id="app" class="app-wrapper">
+      <!-- Horní navigační lišta -->
+      <header id="app-header" class="app-header app-header--hidden">
+        <div class="header-inner container">
+          <div class="header-left">
+            <a href="#/dashboard" class="brand-logo">
+              <span class="brand-logo__icon" aria-hidden="true">📊</span>
+              <span class="brand-logo__text">Měsíční přehled</span>
+            </a>
+
+            <!-- Přepínač aktivního měsíce v záhlaví -->
+            <div class="header-month" id="header-month-ctrl">
+              <button
+                type="button"
+                id="header-prev-month"
+                class="btn-month-nav"
+                aria-label="Předchozí měsíc"
+                title="Předchozí měsíc"
+              >
+                ◀
+              </button>
+              <span id="header-month-display" class="header-month__name">–</span>
+              <button
+                type="button"
+                id="header-next-month"
+                class="btn-month-nav"
+                aria-label="Následující měsíc"
+                title="Následující měsíc"
+              >
+                ▶
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="mobile-menu-toggle"
+            class="mobile-menu-btn"
+            aria-label="Otevřít navigaci"
+            aria-expanded="false"
+          >
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+          </button>
+
+          <nav id="main-nav" class="main-nav" aria-label="Hlavní navigace">
+            <ul class="nav__list">
+              <li>
+                <a href="#/dashboard" class="nav__link" data-route="dashboard">
+                  <span class="nav__icon" aria-hidden="true">🏠</span>
+                  <span>Přehled</span>
+                </a>
+              </li>
+              <li>
+                <a href="#/entries" class="nav__link" data-route="entries">
+                  <span class="nav__icon" aria-hidden="true">📝</span>
+                  <span>Záznamy</span>
+                </a>
+              </li>
+              <li>
+                <a href="#/calendar" class="nav__link" data-route="calendar">
+                  <span class="nav__icon" aria-hidden="true">📅</span>
+                  <span>Kalendář</span>
+                </a>
+              </li>
+              <li>
+                <a href="#/summary" class="nav__link" data-route="summary">
+                  <span class="nav__icon" aria-hidden="true">📈</span>
+                  <span>Shrnutí</span>
+                </a>
+              </li>
+              <li>
+                <a href="#/goals" class="nav__link" data-route="goals">
+                  <span class="nav__icon" aria-hidden="true">🎯</span>
+                  <span>Cíle</span>
+                </a>
+              </li>
+              <li>
+                <a href="#/settings" class="nav__link" data-route="settings">
+                  <span class="nav__icon" aria-hidden="true">⚙️</span>
+                  <span>Nastavení</span>
+                </a>
+              </li>
+            </ul>
+
+            <div id="user-menu" class="user-menu hidden">
+              <span class="user-badge" id="nav-user-badge">
+                <span class="user-badge__icon">👤</span>
+                <span id="nav-username" class="user-badge__name"></span>
+              </span>
+              <button
+                type="button"
+                id="theme-toggle-btn"
+                class="theme-toggle-btn"
+                aria-label="Přepnout motiv"
+                title="Přepnout světlý/tmavý režim"
+              >
+                🌙
+              </button>
+              <button
+                type="button"
+                id="nav-logout-btn"
+                class="btn-logout"
+                aria-label="Odhlásit se"
+                title="Odhlásit se"
+              >
+                🚪
+              </button>
+            </div>
+          </nav>
+        </div>
+      </header>
+
+      <!-- Hlavní obsah stránek (SPA kontejner) -->
+      <main id="app-content" class="app-content container" role="main"></main>
+
+      <!-- Patička aplikace s povinnými školními údaji -->
+      <footer id="app-footer" class="app-footer">
+        <div class="container footer-content">
+          <div class="footer-left">
+            <p class="footer-school">
+              <strong>Střední průmyslová škola dopravní, Praha – Motol</strong>
+            </p>
+            <p class="footer-project">
+              Praktický školní projekt: <em>Měsíční přehled (Month in Review)</em>
+            </p>
+          </div>
+          <div class="footer-right">
+            <p class="footer-author">
+              Autor: <strong>Marek Miláček</strong> | Třída: <strong>3.A</strong>
+            </p>
+            <p class="footer-date">Říjen 2026</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Kontejner pro toast notifikace -->
+    <div id="toast-container" class="toast-container" aria-live="polite" role="status"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

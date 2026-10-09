@@ -1,0 +1,27 @@
+{
+  "name": "mesicni-prehled",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Měsíční přehled – webová aplikace pro sledování návyků, úkolů, studia, výdajů a nálady",
+  "author": "Marek Miláček",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/",
+    "format": "prettier --write \"src/**/*.{js,css,html}\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "jsdom": "^30.1.2",
+    "prettier": "^3.4.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  }
+}
